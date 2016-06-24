@@ -16,7 +16,7 @@ var cron = require('node-schedule');
 
 var responseHandler = function(data) {
   var str = 'It\'s ' + data.list[0].weather[0].description + ' for now. ' +
-    'Current temperature is ' + data.list[0].main.temp;
+    'The temperature at ' + data.list[0].dt_txt.split(' ')[1] + ' will be ' + data.list[0].main.temp;
 
   data.list.every(function(element, index, array) {
 
