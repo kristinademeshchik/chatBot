@@ -32,11 +32,12 @@ var responseHandler = function (data) {
   });
 
   currentDayWeather.forEach(function (element) {
-    if (rainData.length == 0 && element.weather[0].main == 'Rain') {
-      rainData = '. It will be ' + element.weather[0].description + ' at ' + element.dt_txt.split(' ')[1];
+    var item = element.weather[0];
+
+    if (rainData.length == 0 && item.main == 'Rain') {
+      rainData = '. It will be ' + item.description + ' at ' + element.dt_txt.split(' ')[1];
       str += rainData;
     }
-
     if (maxTemperature < element.main.temp) {
       maxTemperature = element.main.temp;
     }
