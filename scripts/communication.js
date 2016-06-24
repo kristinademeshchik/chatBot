@@ -6,7 +6,7 @@
  Minsk id = 625144
 
  Dependencies:
-  * node-schedule
+ * node-schedule
 
  Configuration:
  CITY_ID
@@ -14,19 +14,34 @@
 
 var cron = require('node-schedule');
 
-var responseHandler = function(data) {
-  var str = 'It\'s ' + data.list[0].weather[0].description + ' for now. ' +
-    'The temperature at ' + data.list[0].dt_txt.split(' ')[1] + ' will be ' + data.list[0].main.temp;
+var responseHandler = function (data) {
+  var str,
+    currentDayWeather,
+    currentTemperature,
+    maxTemperature,
+    rainData = '',
+    currentDate = new Date().getDate();
 
-  data.list.every(function(element, index, array) {
+  currentTemperature = maxTemperature = data.list[0].main.temp;
 
-    if (element.weather[0].main == 'Rain') {
-      str += '. It will be ' + element.weather[0].description + ' at ' + element.dt_txt.split(' ')[1];
-      return false;
+  str = 'It\'s ' + data.list[0].weather[0].description + ' for now. ' +
+    'The temperature at ' + data.list[0].dt_txt.split(' ')[1] + ' will be ' + currentTemperature;
+
+  currentDayWeather = data.list.filter(function (element) {
+    return element.dt_txt.split(' ')[0].split('-')[2] == currentDate;
+  });
+
+  currentDayWeather.forEach(function (element) {
+    if (rainData.length == 0 && element.weather[0].main == 'Rain') {
+      rainData = '. It will be ' + element.weather[0].description + ' at ' + element.dt_txt.split(' ')[1];
+      str += rainData;
     }
 
-    return true;
+    if (maxTemperature < element.main.temp) {
+      maxTemperature = element.main.temp;
+    }
   });
+  str += ' Max temperature will be ' + maxTemperature;
 
   return str;
 };
@@ -47,7 +62,7 @@ module.exports = function (robot) {
       }
     });
 
-    cron.scheduleJob({hour: 9, minute: 08, dayOfWeek: [1,2,3,4,5,6,7]}, function(){
+    cron.scheduleJob({hour: 7, minute: 30, dayOfWeek: [1, 2, 3, 4, 5, 6, 7]}, function () {
       response.send(currentWeather);
     });
 
