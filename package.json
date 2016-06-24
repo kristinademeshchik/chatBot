@@ -8,7 +8,6 @@
   "devDependencies": {
     "hubot": "^2.16.0",
     "hubot-env": "0.0.2",
-    "hubot-google-images": "^0.2.1",
     "hubot-help": "^0.1.1",
     "hubot-heroku-keepalive": "^1.0.0",
     "hubot-redis-brain": "0.0.3",
