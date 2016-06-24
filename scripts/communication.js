@@ -14,22 +14,41 @@
 
 var cron = require('node-schedule');
 
+var responseHandler = function(data) {
+  var str = 'It\'s ' + data.list[0].weather[0].description + ' for now. ' +
+    'Current temperature is ' + data.list[0].main.temp;
+
+  data.list.every(function(element, index, array) {
+
+    if (element.weather[0].main == 'Rain') {
+      str += '. It will be ' + element.weather[0].description + ' at ' + element.dt_txt.split(' ')[1];
+      return false;
+    }
+
+    return true;
+  });
+
+  return str;
+};
+
 module.exports = function (robot) {
 
   robot.hear(new RegExp('Send me the weather, pls', 'i'), function (response) {
     var currentWeather,
       url = 'http://api.openweathermap.org/data/2.5/forecast/city?id=' + process.env.CITY_ID + '&units=metric&APPID=62cb294f506741358b20565888f4a2e2';
 
-    cron.scheduleJob({hour: 17, minute: 13, dayOfWeek: [1,2,3,4,5,6,7]}, function(){
-      robot.http(url).get()(function (err, res, body) {
-        if (err) {
-          console.log('error');
-        }
-        else {
-          currentWeather = JSON.parse(body);
-        }
-        response.send('Current temperature is ' +  currentWeather.list[0].main.temp);
-      });
+    robot.http(url).get()(function (err, res, body) {
+      if (err) {
+        console.log('error');
+      }
+      else {
+        currentWeather = responseHandler(JSON.parse(body));
+        response.send(currentWeather);
+      }
+    });
+
+    cron.scheduleJob({hour: 9, minute: 08, dayOfWeek: [1,2,3,4,5,6,7]}, function(){
+      response.send(currentWeather);
     });
 
     response.send('No problem ;)');
